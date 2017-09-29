@@ -61,3 +61,53 @@ def urlify(string: str, length: int) -> str:
             buffer[buffer_i] = url[url_i] if url_i < length else None
         buffer_i = (buffer_i + 1) % 3
     return ''.join(url)
+
+
+# 1.4 Palindrome Permutation: Given a string, write a function to check if it is a permutation of a
+# palindrome.  A palindrome is a word or phrase that is the same forwards and backwards.  A permutation
+# is a rearrangement of letters.  The palindrome does not need to be limited to just dictionary words.
+# EXAMPLE
+# Input:    Tact Coa
+# Output:   True (permutations: "taco cat", "atco cta", etc.)
+def is_palindrome_permutation(string: str) -> bool:
+    character_counts = {}
+    length = 0
+    for character in string.lower():
+        if character.isspace():
+            continue
+        length += 1
+        character_counts[character] = character_counts.get(character, 0) + 1
+    # if string is even length, then all counts of characters should be even so they mirror each other
+    if length % 2 == 0:
+        return all(count % 2 == 0 for count in character_counts.values())
+    # if string is odd length, then all counts of characters except one (middle) should be even
+    return sum(count % 2 == 1 for count in character_counts.values()) == 1
+
+
+# 1.5 One Away: There are three types of edits that can be performed on strings: insert a character,
+# remove a character, or replace a character.  Given two strings, write a function to check if they are
+# one edit (or zero edits) away.
+def one_away(string: str, other_string: str) -> bool:
+    # same length -> replace only works.  Check if one mismatch
+    if len(string) == len(other_string):
+        error_count = 0
+        for i in range(len(string)):
+            if string[i] != other_string[i]:
+                error_count += 1
+            if error_count > 1:
+                return False
+        return True
+    # length off by one -> only add/remove works check if one mismatch
+    elif abs(len(string) - len(other_string)) == 1:
+        shorter_string, longer_string = string, other_string
+        if len(string) > len(other_string):
+            shorter_string, longer_string = other_string, string
+        error_count = 0
+        for i in range(len(shorter_string)):
+            j = i - error_count
+            if shorter_string[j] != longer_string[i]:
+                error_count += 1
+            if error_count > 1:
+                return False
+        return True
+    return False
