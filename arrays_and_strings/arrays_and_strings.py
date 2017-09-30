@@ -188,4 +188,4 @@ def zero_matrix(matrix: List[List[T]]) -> List[List[T]]:
 # of another.  Given two strings, s1 and s2, write code to check if s2 is a rotation of s1 using only one
 # call to isSubstring (e.g. "waterbottle" is a rotation of "erbottlewat").
 def is_rotation(string: str, other_string: str) -> bool:
-    pass
+    return string in (other_string + other_string)
