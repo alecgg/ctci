@@ -13,6 +13,9 @@ class LinkedList:
     def __init__(self, head=None):
         self.head = head
 
+    def __len__(self):
+        return sum(1 for _ in self)
+
     def append(self, node):
         if self.head is None:
             self.head = node
@@ -162,12 +165,40 @@ def sum_lists(linked_list, other_linked_list):
 
 
 def sum_lists_reverse(linked_list, other_linked_list):
-    pass
+    exponent = len(linked_list) - 1
+    other_exponent = len(other_linked_list) - 1
+    value = 0
+    other_value = 0
+    for node in linked_list:
+        value += node.value * 10**exponent
+        exponent -= 1
+    for node in other_linked_list:
+        other_value += node.value * 10**other_exponent
+        other_exponent -= 1
+    out_list = LinkedList()
+    out_value = value + other_value
+    while out_value > 0:
+        node = Node(out_value % 10)
+        out_value //= 10
+        node.next = out_list.head
+        out_list.head = node
+    return out_list
 
 
 # 2.6 Palindrome: Implement a function to check if a linked list is palindrome.
 def is_palindrome(linked_list):
-    pass
+    # could just form array from linked list and then do this like a normal person
+    advances = len(linked_list) - 1
+    node = linked_list.head
+    for i in range(advances // 2):
+        compare = node
+        for j in range(advances):
+            compare = compare.next
+        if node.value != compare.value:
+            return False
+        advances -= 2
+        node = node.next
+    return True
 
 
 # 2.7 Intersection: Given two (singly) linked lists, determine if the two lists intersect.  Return the
@@ -175,7 +206,11 @@ def is_palindrome(linked_list):
 # node of the linked list is the exact same node (by reference) as the jth node of the second
 # linked list, then they are intersecting.
 def intersection(linked_list, other_linked_list):
-    pass
+    for node in linked_list:
+        for other_node in other_linked_list:
+            if node is other_node:
+                return node
+    return None
 
 
 # 2.8 Loop Detection: Given a circular linked list, implement an algorithm that returns the node at the
@@ -186,5 +221,13 @@ def intersection(linked_list, other_linked_list):
 # EXAMPLE
 # Input: A -> B -> C -> D -> E -> C [the same C as earlier]
 # Output: C
+
+# A B C D E C D E C D E
+#       A B C D E C D E C D E
 def loop_detection(linked_list):
-    pass
+    nodes = set()
+    for node in linked_list:
+        if node in nodes:
+            return node
+        nodes.add(node)
+    return None
