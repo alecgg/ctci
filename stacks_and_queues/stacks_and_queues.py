@@ -1,3 +1,6 @@
+from collections import deque
+
+
 class Node:
     def __init__(self, value):
         self.value = value
@@ -7,15 +10,21 @@ class Node:
 class Stack:
     def __init__(self):
         self.top = None
+        self.size = 0
+
+    def __len__(self):
+        return self.size
 
     def push(self, item):
         node = Node(item)
         node.next = self.top
         self.top = node
+        self.size += 1
 
     def pop(self):
         node = self.top
         self.top = node.next
+        self.size -= 1
         return node.value
 
     def peek(self):
@@ -67,6 +76,7 @@ class StackMin(Stack):
     def min(self):
         return self.top.minimum.value
 
+
 # 3.3 Stack of Plates: Imagine a (literal) stack of plates.  If the stack gets too high, it might topple.
 # Therefore, in real life, we would likely start a new stack when the previous stack exceeds some
 # threshold.  Implement a data structure SetOfStacks that mimics this.  SetOfStacks should be
@@ -75,12 +85,92 @@ class StackMin(Stack):
 # that is, pop() should return the same values as it would if there were just a single stack).
 # FOLLOW UP
 # Implement a function popAt(int index) which performs a pop operation on a specific sub-stack
+class SetOfStacks:
+    def __init__(self, capacity=10):
+        self.capacity = capacity
+        self.stacks = [Stack()]
+
+    @property
+    def stack(self):
+        return self.stacks[-1]
+
+    def push(self, item):
+        if len(self.stack) == self.capacity:
+            stack = Stack()
+            self.stacks.append(stack)
+        self.stack.push(item)
+
+    def pop(self):
+        if self.stack.is_empty():
+            self.stacks.pop()
+        return self.stack.pop()
+
+    def peek(self):
+        return self.stack.peek()
+
+    def is_empty(self):
+        return self.stack.is_empty() and len(self.stacks) == 1
+
+    def pop_at(self, index):
+        return self.stacks[index].pop()
+
 
 # 3.4 Queue via Stacks: Implement a MyQueue class which implements a queue using two stacks.
+class MyQueue:
+    def __init__(self):
+        self.left_stack = Stack()
+        self.right_stack = Stack()
+
+    def enqueue(self, item):
+        self.left_stack.push(item)
+
+    def dequeue(self):
+        while not self.left_stack.is_empty():
+            self.right_stack.push(self.left_stack.pop())
+        out = self.right_stack.pop()
+        while not self.right_stack.is_empty():
+            self.left_stack.push(self.right_stack.pop())
+        return out
+
+    def peek(self):
+        while not self.left_stack.is_empty():
+            self.right_stack.push(self.left_stack.pop())
+        out = self.right_stack.peek()
+        while not self.right_stack.is_empty():
+            self.left_stack.push(self.right_stack.pop())
+        return out
+
+    def is_empty(self):
+        return self.left_stack.is_empty()
+
 
 # 3.5 Sort Stack:  Write a program to sort a stack such that the smallest items are on the top.  You can use
 # an additional temporary stack, but you may not copy the elements into any other data structure
 # (such as an array).  The stack supports the following operations: push, pop, peek, and isEmpty.
+class SortedStack:
+    def __init__(self):
+        self.stack = Stack()
+
+    def push(self, item):
+        if self.stack.is_empty():
+            self.stack.push(item)
+        else:
+            temporary_stack = Stack()
+            while not self.stack.is_empty() and item > self.stack.peek():
+                temporary_stack.push(self.stack.pop())
+            self.stack.push(item)
+            while not temporary_stack.is_empty():
+                self.stack.push(temporary_stack.pop())
+
+    def pop(self):
+        return self.stack.pop()
+
+    def peek(self):
+        return self.stack.peek()
+
+    def is_empty(self):
+        return self.stack.is_empty()
+
 
 # 3.6 Animal Shelter: An animal shelter, which holds only dogs and cats, operates on a strictly "first in, first
 # out" basis.  People must adopt either the "oldest" (based on arrival time) of all animals at the shelter,
@@ -88,3 +178,60 @@ class StackMin(Stack):
 # that type).  They cannot select which specific animal they would like.  Create the data structures to
 # maintain this system and implement operations such as enqueue, dequeueAny, dequeueDog,
 # and dequeueCat.  You may use the build-in LinkedList data structure.
+class Dog:
+    def __init__(self, name='Inca'):
+        self.name = name
+
+
+class Cat:
+    def __init__(self, name='Mordecai'):
+        self.name = name
+
+
+class AnimalQueue:
+    def __init__(self):
+        self.dog_queue = deque()
+        self.cat_queue = deque()
+        self.ticket = 0
+
+    def enqueue(self, animal):
+        self.ticket += 1
+        if isinstance(animal, Dog):
+            self.dog_queue.append((animal, self.ticket))
+        elif isinstance(animal, Cat):
+            self.cat_queue.append((animal, self.ticket))
+
+    def dequeue_any(self):
+        dog, dog_ticket = None, None
+        try:
+            dog, dog_ticket = self.dog_queue.popleft()
+        except IndexError:
+            pass
+
+        cat, cat_ticket = None, None
+        try:
+            cat, cat_ticket = self.cat_queue.popleft()
+        except IndexError:
+            pass
+
+        if dog is None:
+            animal = cat
+        elif cat is None:
+            animal = cat
+        elif dog_ticket < cat_ticket:
+            animal = dog
+        else:
+            animal = cat
+
+        if animal is not None:
+            if animal is dog and cat is not None:
+                self.cat_queue.appendleft((cat, cat_ticket))
+            elif animal is cat and dog is not None:
+                self.dog_queue.appendleft((dog, dog_ticket))
+        return animal
+
+    def dequeue_dog(self):
+        return self.dog_queue.popleft()[0]
+
+    def dequeue_cat(self):
+        return self.cat_queue.popleft()[0]
