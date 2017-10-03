@@ -27,11 +27,59 @@ class TreeNode:
         self.value = value
         self.left = left
         self.right = right
+        self.parent = None
+
+    def __len__(self):
+        size = 1
+        if self.left is not None:
+            size += len(self.left)
+        if self.right is not None:
+            size += len(self.right)
+        return size
+
+    def height(self):
+        left_height = self.left.height() if self.left is not None else 0
+        right_height = self.right.height() if self.right is not None else 0
+        return 1 + max([left_height, right_height])
+
+    def max_child(self):
+        left_max = self.left.max_child() if self.left is not None else None
+        right_max = self.right.max_child() if self.right is not None else None
+        if left_max is None and right_max is None:
+            return None
+        return max(n for n in [left_max, right_max] if n is not None)
+
+    def min_child(self):
+        left_min = self.left.min_child() if self.left is not None else None
+        right_min = self.right.min_child() if self.right is not None else None
+        if left_min is None and right_min is None:
+            return None
+        return min(n for n in [left_min, right_min] if n is not None)
+
+    def is_binary_search_tree_root(self):
+        max_left = self.left.max_child() if self.left is not None else None
+        min_right = self.right.min_child() if self.right is not None else None
+        if max_left is None and min_right is None:
+            return True
+        elif max_left is None:
+            return max_left <= self.value
+        elif min_right is None:
+            return self.value < min_right
+        return max_left <= self.value < min_right
 
 
 class BinaryTree:
     def __init__(self, root=None):
         self.root = root
+
+    def __len__(self):
+        return len(self.root)
+
+    def height(self):
+        return self.root.height()
+
+    def is_binary_search_tree(self):
+        return self.root.is_binary_search_tree_root()
 
 
 # 4.1 Given a directed graph, design an algorithm to find out whether there is a route between two nodes.
@@ -60,47 +108,74 @@ def binary_tree_from_sorted_list(sorted_list):
     mid = len(sorted_list) // 2
     root = TreeNode(sorted_list[mid])
     tree = BinaryTree(root=root)
-    root.right = binary_tree_from_sorted_list_helper(sorted_list, mid + 1, len(sorted_list))
+    root.right = binary_tree_from_sorted_list_helper(sorted_list, mid + 1, len(sorted_list) - 1)
     root.left = binary_tree_from_sorted_list_helper(sorted_list, 0, mid - 1)
     return tree
 
 
 def binary_tree_from_sorted_list_helper(sorted_list, i, j):
-    if i >= j:
+    if i > j:
         return None
-    if j - i == 1:
+    if i == j:
         return TreeNode(value=sorted_list[i])
     mid = (i + j) // 2
     root = TreeNode(sorted_list[mid])
-    root.right = binary_tree_from_sorted_list_helper(sorted_list, mid + 1, len(sorted_list))
-    root.left = binary_tree_from_sorted_list_helper(sorted_list, 0, mid - 1)
+    root.right = binary_tree_from_sorted_list_helper(sorted_list, mid + 1, j)
+    root.left = binary_tree_from_sorted_list_helper(sorted_list, i, mid - 1)
     return root
 
 
 # 4.3 List of Depths: Given a binary tree, design an algorithm which creates a linked list of all the nodes
 # at each depth (e.g., if you have a tree with depth D, you'll have D linked lists).
-def list_of_depths(binary_tree):
-    # initial list - add root
-    # add left and right to list?
+def list_of_depths(binary_tree: BinaryTree) -> bool:
+    if binary_tree.root is None:
+        return []
+
     root = binary_tree.root
-    linked_lists = []
+    linked_lists = deque([root])
+    depth_queue = deque([root])
+    while len(depth_queue) > 0:
+        linked_list = depth_queue.popleft()
+        next_linked_list = deque()
+        for node in linked_list:
+            if node.left is not None:
+                next_linked_list.append(node.left)
+            if node.right is not None:
+                next_linked_list.append(node.right)
+        depth_queue.append(next_linked_list)
+        linked_lists.append(next_linked_list)
     return linked_lists
 
 
 # 4.4 Check Balanced: Implement a function to check if a binary tree is balanced.  For the purposes of
 # this question, a balanced tree is defined to be a tree such that the heights of the two subtrees of any
 # node never differ by more than one.
-def is_balanced(binary_tree):
-    pass
+def is_balanced(binary_tree: BinaryTree) -> bool:
+    # just need height, not size
+    nodes_to_visit = deque([binary_tree.root])
+    while nodes_to_visit is not None:
+        node = nodes_to_visit.popleft()
+        left_height = node.left.height() if node.left is not None else 0
+        right_height = node.right.height() if node.right is not None else 0
+        if abs(left_height - right_height) > 1:
+            return False
+        nodes_to_visit.extend(n for n in [node.left, node.right] if n is not None)
+    return True
 
 
 # 4.5 Validate BST: Implement a function to check if a binary tree is a binary search tree.
-def is_binary_search_tree(binary_tree):
-    pass
+def is_binary_search_tree(binary_tree: BinaryTree) -> bool:
+    # need to validate all on left <= me < right
+    # so get max value from left
+    # and min value from right
+    # compare to me
+    return binary_tree.is_binary_search_tree()
 
 
 # 4.6 Successor: Write an algorithm to find the "next" node (i.e., the in-order successor) of a given node in a
 # binary search tree.  You may assume that each node has a link to its parent.
+def successor(node: TreeNode) -> TreeNode:
+    pass
 
 # 4.7 Build Order: You are given a list of projects and a list of dependencies (which is a list of pairs of
 # projects, where the second project is dependent on the first project).  ALl of a project's dependencies
