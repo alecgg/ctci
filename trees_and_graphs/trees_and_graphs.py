@@ -23,11 +23,15 @@ class DirectedGraph:
 
 
 class TreeNode:
-    pass
+    def __init__(self, value=None, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
 
 
 class BinaryTree:
-    pass
+    def __init__(self, root=None):
+        self.root = root
 
 
 # 4.1 Given a directed graph, design an algorithm to find out whether there is a route between two nodes.
@@ -48,12 +52,29 @@ def route_exists(node, other_node):
 # 4.2 Minimal Tree: Given a sorted (increasing order) array with unique integer elements, write an
 # algorithm to create a binary search tree with minimal height.
 def binary_tree_from_sorted_list(sorted_list):
-    # make middle root
-    # split into L/R groups
-    # make middle of L group root of new tree on left
-    # make middle of R group root of new tree on right
-    # continue
-    pass
+    if len(sorted_list) == 0:
+        return BinaryTree()
+    if len(sorted_list) == 1:
+        root = TreeNode(value=sorted_list[0])
+        return BinaryTree(root=root)
+    mid = len(sorted_list) // 2
+    root = TreeNode(sorted_list[mid])
+    tree = BinaryTree(root=root)
+    root.right = binary_tree_from_sorted_list_helper(sorted_list, mid + 1, len(sorted_list))
+    root.left = binary_tree_from_sorted_list_helper(sorted_list, 0, mid - 1)
+    return tree
+
+
+def binary_tree_from_sorted_list_helper(sorted_list, i, j):
+    if i >= j:
+        return None
+    if j - i == 1:
+        return TreeNode(value=sorted_list[i])
+    mid = (i + j) // 2
+    root = TreeNode(sorted_list[mid])
+    root.right = binary_tree_from_sorted_list_helper(sorted_list, mid + 1, len(sorted_list))
+    root.left = binary_tree_from_sorted_list_helper(sorted_list, 0, mid - 1)
+    return root
 
 
 # 4.3 List of Depths: Given a binary tree, design an algorithm which creates a linked list of all the nodes
@@ -61,7 +82,9 @@ def binary_tree_from_sorted_list(sorted_list):
 def list_of_depths(binary_tree):
     # initial list - add root
     # add left and right to list?
-    pass
+    root = binary_tree.root
+    linked_lists = []
+    return linked_lists
 
 
 # 4.4 Check Balanced: Implement a function to check if a binary tree is balanced.  For the purposes of
