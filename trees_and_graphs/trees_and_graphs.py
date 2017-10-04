@@ -1,5 +1,6 @@
 from collections import deque
 from itertools import permutations
+from random import choice
 
 
 class Edge:
@@ -265,17 +266,34 @@ def bst_sequences(binary_search_tree):
 # That is, if you cut off the tree at node n, the two trees would be identical.
 def is_subtree(bigger_tree, smaller_tree):
     # look for the root of the smaller tree in the bigger tree
-    pass
+    # could get height of smaller tree and not go deeper than that into larger tree
+    nodes_to_search = deque(bigger_tree.root)
+    while len(nodes_to_search) > 0:
+        node = nodes_to_search.popleft()
+        if node is smaller_tree.root:
+            return node
+        if node is None:
+            continue
+        nodes_to_search.extend([node.left, node.right])
+    return None
 
 
 # 4.11 Random Node: You are implementing a binary tree class from scratch which, in addition to
 # insert, find, and delete, has a method getRandomNode() which returns a random node
 # from the tree.  ALl nodes should be equally likely to be chosen.  Design and implement an algorithm
-# for getRandomNode, and explain how you would implement the rest of the methods.
+# for getRandomNode, and explain how you would implement the rest of the methods
 def get_random_node(binary_tree):
     # flatten array into an array and pick random element
     # pointer to root
-    pass
+    nodes_to_search = deque([binary_tree.root])
+    nodes = []
+    while len(nodes_to_search) > 0:
+        node = nodes_to_search.popleft()
+        if node is None:
+            continue
+        nodes.append(node)
+        nodes_to_search.extend([node.left, node.right])
+    return choice(nodes)
 
 
 # 4.12 Paths with Sum: You are given a binary tree in which each node contains an integer value (which
@@ -284,4 +302,13 @@ def get_random_node(binary_tree):
 # (traveling only from parent nodes to child nodes).
 def path_sum(binary_tree, value):
     # each node has a sum value, do an in-order traversal
-    pass
+    nodes_to_search = deque([(binary_tree.root, binary_tree.root.value)])
+    paths = 0
+    while len(nodes_to_search) > 0:
+        node, node_sum = nodes_to_search.popleft()
+        if node_sum == value:
+            paths += 1
+        nodes_to_search.extend([
+            (n, n.value + node_sum) for n in [node.left, node.right] if n is not None
+        ])
+    return paths
