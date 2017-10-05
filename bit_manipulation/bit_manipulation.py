@@ -7,22 +7,31 @@
 
 def insert(n: int, m: int, i: int, j: int) -> int:
     length = 32
-    # n     m   i   j
-    # 11111 00  1   3 ->  10001?
-
+    # n        m   i   j
+    # 00011111 00  1   3 ->  10001?
     # Clear space in n for m of size j - i + 1 at positions [i, j] (part the sea)
-    # 1---1
-    # shift m over by i positions
-    # --00-
-    # insert m into n
-    # 1-001
-    pass
+    # shift n left by j - i + 1 and mask off area of the insertion and right of the insertion
+    # nnnn----
+    # -------n  mask off insertion area plus and area left of insertion
+    # ----mmm-  shift m left by j - i + 1 positions
+    # nnnnmmmn combine!
+    left = n << (j - i + 1)
+    left = left & (-1 << j)
+
+    right = n & ~(-1 << i)
+
+    middle = m << j - i + 1
+
+    return left | middle | right
 
 
 # 5.2 Binary to String: Given a real number between 0 and 1 (e.g., 0.72) that is passed in as a double, print
 # the binary representation.  If the number cannot be represented accurately in binary with at most 32
 # characters, print "ERROR."
 def binary_to_string(number):
+    # OK so 0.72 to 0.0101010101
+    # read that incorrectly
+    # 0.72 = (7 * 10^-1) + (2 * 10^-2) + (0 * 10^-3) + ...
     pass
 
 
