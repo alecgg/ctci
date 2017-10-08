@@ -74,8 +74,71 @@ def longest_one_run(integer: int) -> int:
 
 # 5.4 Next Number: Given a positive integer, print the next smallest and the next largest number that
 # have the same number of 1 bits in their binary representation.
-def next_number(integer: int) -> (int, int):
-    pass
+def next_number(integer: int) -> bin:
+    # 0001 -> 0000 -> 0000 -> 0001
+
+    # 1001 -> 1000 -> 0100 -> 0110
+
+    # 0011 -> 0010 -> 0001 -> 0011
+    # 1100 -> 1010
+    # 0101 -> 0100 -> 0010 -> 0011
+    # 1001 -> 1000 -> 0100 -> 0110
+
+    # 0111 -> 0110 -> 0101 -> 0111
+    # 1110 -> 1101
+    # 1011 -> 1010 -> 0110 -> 0111
+    # 1101 -> 1100 -> 1010 -> 1011
+
+    # swap rightmost 10
+    # if falls off:
+    #   swap rightmost 10
+    #   turn leftmost zero to right of swap or swap spot to a 1
+
+    # 1001 -> 1010
+    # 0011 -> 0101
+    # 1100 -> 1100
+    # 0101 -> 0110
+    # 1001 -> 1010
+
+    # 0111 -> 1011
+    # 1110 -> 1110
+    # 1011 -> 1101
+    # 1101 -> 1110
+
+    # 01100 -> 10|100
+    # 01011 -> 01101
+
+    # 01110 -> 10|110 -> 10|110 -> 10|110 -> 10|000 -> 10|011
+    #             001 ->    011 ->    011 -> 10|011
+
+    # swap rightmost 01
+    # if most significant bit is swapped: <- how to tell?
+    # mask & number != 0? where mask = 1s until bit swapped
+
+    zero_one = 0b01
+    mask = 0b11
+    most_signficant_bit_mask = 0b1
+    most_signficant_bit_swapped = False
+    for i in range(31):
+        if (integer & mask) ^ zero_one is 0b0:
+            if (integer & ~most_signficant_bit_mask) is 0b0:
+                return integer ^ mask
+            else:
+                most_signficant_bit_swapped = True
+                break
+        zero_one <<= 1
+        mask <<= 1
+        most_signficant_bit_mask = (most_signficant_bit_mask << 1) | 0b1
+
+    if most_signficant_bit_swapped:
+        ones = 0b0
+        mask = 0b1
+        for j in range(i):
+            if integer & mask is not 0b0:
+                ones |= 1
+                ones <<= 1
+        return (integer & ~mask) | ones
+    return integer
 
 # 5.5 Debugger: Explain what the following code does: ((n & (n - 1)) == 0)
 
