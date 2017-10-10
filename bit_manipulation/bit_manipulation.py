@@ -75,70 +75,49 @@ def longest_one_run(integer: int) -> int:
 # 5.4 Next Number: Given a positive integer, print the next smallest and the next largest number that
 # have the same number of 1 bits in their binary representation.
 def next_number(integer: int) -> bin:
-    # 0001 -> 0000 -> 0000 -> 0001
-
-    # 1001 -> 1000 -> 0100 -> 0110
-
-    # 0011 -> 0010 -> 0001 -> 0011
-    # 1100 -> 1010
-    # 0101 -> 0100 -> 0010 -> 0011
-    # 1001 -> 1000 -> 0100 -> 0110
-
-    # 0111 -> 0110 -> 0101 -> 0111
-    # 1110 -> 1101
-    # 1011 -> 1010 -> 0110 -> 0111
-    # 1101 -> 1100 -> 1010 -> 1011
-
+    # next smallest
     # swap rightmost 10
-    # if falls off:
-    #   swap rightmost 10
-    #   turn leftmost zero to right of swap or swap spot to a 1
+    # if most significant digit swapped:
+    #   shift all 1s right of the swap to the left
+    # 101 -> 011
+    one_zero = 0b10
+    mask = 0b11
+    right_of_swap_mask = 0b1
+    for i in range(31):
+        if (integer & mask) ^ one_zero is 0b0:
+            integer ^= mask
+            break
+        one_zero <<= 1
+        mask <<= 1
+        right_of_swap_mask = (right_of_swap_mask << 1) | 0b1
+    if (integer & ~right_of_swap_mask) is not 0b0:
+        right_of_swap = integer & right_of_swap_mask
 
-    # 1001 -> 1010
-    # 0011 -> 0101
-    # 1100 -> 1100
-    # 0101 -> 0110
-    # 1001 -> 1010
 
-    # 0111 -> 1011
-    # 1110 -> 1110
-    # 1011 -> 1101
-    # 1101 -> 1110
+    return integer
 
-    # 01100 -> 10|100
-    # 01011 -> 01101
-
-    # 01110 -> 10|110 -> 10|110 -> 10|110 -> 10|000 -> 10|011
-    #             001 ->    011 ->    011 -> 10|011
-
+    # next largest
     # swap rightmost 01
-    # if most significant bit is swapped: <- how to tell?
-    # mask & number != 0? where mask = 1s until bit swapped
-
+    # if most significant digit swapped:
+    #   push 1s right of swap to the right
     zero_one = 0b01
     mask = 0b11
-    most_signficant_bit_mask = 0b1
-    most_signficant_bit_swapped = False
+    right_of_swap_mask = 0b1
     for i in range(31):
         if (integer & mask) ^ zero_one is 0b0:
-            if (integer & ~most_signficant_bit_mask) is 0b0:
-                return integer ^ mask
-            else:
-                most_signficant_bit_swapped = True
+                integer ^= mask
                 break
         zero_one <<= 1
         mask <<= 1
-        most_signficant_bit_mask = (most_signficant_bit_mask << 1) | 0b1
+        right_of_swap_mask = (right_of_swap_mask << 1) | 0b1
 
-    if most_signficant_bit_swapped:
-        ones = 0b0
-        mask = 0b1
-        for j in range(i):
-            if integer & mask is not 0b0:
-                ones |= 1
-                ones <<= 1
-        return (integer & ~mask) | ones
+    if (integer & ~right_of_swap_mask) is not 0b0:
+        right_of_swap = integer & right_of_swap_mask
+        while right_of_swap is not 0b0 and right_of_swap & 0b1 is 0:
+            right_of_swap >>= 1
+        integer = (integer & ~right_of_swap_mask) | right_of_swap
     return integer
+
 
 # 5.5 Debugger: Explain what the following code does: ((n & (n - 1)) == 0)
 
@@ -146,10 +125,26 @@ def next_number(integer: int) -> bin:
 # 5.6 Conversion: Write a function to determine the number of bits you would need to flip to convert
 # integer A to integer B.
 def num_flips(a: int, b: int) -> int:
-    pass
+    flips = 0
+    ones_in_swap_positions = a ^ b
+    mask = 0b1
+    for _ in range(32):
+        flips += ones_in_swap_positions & mask
+        ones_in_swap_positions >>= 1
+    return flips
+
 
 # 5.7 Pairwise swap.  Write a program to swap odd and even bits in an integer with as few instructions as
 # possible.  (e.g., bit 0 and bit 1 are swapped, bit 2 and bit 3 are swapped, and so on).
+def pairwise_swap(integer: int) -> int:
+    odds = integer >> 1
+    odds_mask = 0b01010101010101010101010101010101
+
+    evens = integer << 1
+    evens_mask = 0b10101010101010101010101010101010
+
+    return (odds & odds_mask) | (evens & evens_mask)
+
 
 # 5.8 Draw Line: A monochrome screen is stored as a single array of bytes, allowing eight consecutive
 # pixels to be stored in one byte.  THe screen has width w, where w is divisible by 8 (that is, no byte will
