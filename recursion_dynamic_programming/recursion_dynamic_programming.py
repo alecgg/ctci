@@ -1,6 +1,9 @@
 # 8.1 Triple Step: A child is running up a staircase with n steps and can hop either 1 step, 2 steps, or 3
 # steps at a time.  Implement a method to count how many possible ways the child can run up the
 # stairs.
+from collections import deque
+
+
 def step_paths(num_steps: int) -> int:
     num_paths = 0
     if num_steps > 1:
@@ -90,8 +93,15 @@ def power_set(elements):
 # * operator.  You can use addition, subtraction, and bit shifting, but you should minimize the
 # number of those operations.
 def multiply(a, b):
-    output = 0
-    pass
+    if a == 1:
+        return b
+    if b == 1:
+        return a
+    if a % 2 == 0:
+        return multiply(a >> 1, b) << 1
+    if b % 2 == 0:
+        return multiply(a, b >> 1) << 1
+    return a + multiply(a, b - 1)
 
 
 # 8.6 Towers of Hanoi: In the classic problem of the Towers of Hanoi, you have 3 towers and N disks of
@@ -102,9 +112,57 @@ def multiply(a, b):
 # (2) A disk is slid off the top of one tower onto another tower.
 # (3) A disk cannot be placed on top of a smaller disk.
 # Write a program to move the disks from the first tower to the last using stacks.
+def towers_of_hanoi(num_disks):
+    left, middle, right = deque(range(num_disks)), deque(), deque()
+    move_disks(num_disks, start=left, end=right, free=middle)
+    return left, middle, right
+
+
+def move_disks(num_disks, start, end, free):
+    # if only one disk, move to goal
+    # else, move n - 1 disks to middle
+    # 1 disk to right
+    # n - 1 disk to right
+    if any(sorted(list(d)) != list(d) for d in (start, end, free)):
+        raise Exception('OUT OF ORDER!')
+    if num_disks == 1:
+        end.append(start.pop())
+        return
+    move_disks(num_disks - 1, start, end=free, free=end)
+    move_disks(1, start, end, free)
+    move_disks(num_disks - 1, start=free, end=end, free=start)
+    return
+
 
 # 8.7 Permutations without Dups: Write a method to compute all permutations of a string of unique
 # characters.
+def permutations_without_dups(string):
+    if len(string) in (0, 1):
+        yield string
+        return
+    one_less_permutations = permutations_without_dups(string[:-1])
+    last_character = string[-1]
+    for permutation in one_less_permutations:
+        for i in range(len(permutation) + 1):
+            yield permutation[:i] + last_character + permutation[i:]
+
 
 # 8.8 Permutations with Dups: Write a method to compute all permutations of a string whose
 # characters are not necessarily unique.  The list of permutations should not have duplicates.
+def permutations_with_dups(string, generated_permutations=None):
+    if len(string) in (0, 1):
+        yield string
+        return
+
+    # remember old permutations
+    if generated_permutations is None:
+        generated_permutations = set()
+
+    one_less_permutations = permutations_with_dups(string[:-1])
+    last_character = string[-1]
+    for permutation in one_less_permutations:
+        for i in range(len(permutation) + 1):
+            new_permutation = permutation[:i] + last_character + permutation[i:]
+            if new_permutation not in generated_permutations:
+                generated_permutations.add(new_permutation)
+                yield new_permutation
