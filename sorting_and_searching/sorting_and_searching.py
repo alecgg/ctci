@@ -52,6 +52,55 @@ def string_to_count(string):
 # 10.3 Search in a Rotated Array: Given a sorted array of n integers that has been rotated an unknown
 # number of times, write code to find an element in the array.  You may assume that the array was
 # originally sorted in increasing order.
+# EXAMPLE
+# Input: find 5 in {15, 16, 19, 20, 25, 1, 3, 4, 5, 7, 10, 14}
+# Output: 8 (the index of 5 in the array)
+def rotated_search(element, array):
+    # find rotation point by doing a custom binary search
+    # then do a normal binary search for the element to be found
+    low = 0
+    high = len(array) - 1
+    inflexion_point = None
+    minimum = None
+    while inflexion_point is None:
+        # Early stop if we find the element
+        mid = (low + high) // 2
+        value = array[mid]
+        if value == element:
+            return mid
+
+        minimum = min(m for m in (minimum, value) if m is not None)
+        # Reached far-left, comrade
+        if mid == 0:
+            inflexion_point = 0
+        # Found inflexion point
+        elif value < array[mid - 1]:
+            inflexion_point = mid
+        elif mid + 1 < len(array) - 1 and value > array[mid + 1]:
+            inflexion_point = mid + 1
+        # if value is <= minimum, normal binary search for minimum continues to the left
+        elif value <= minimum:
+            high = mid - 1
+        # otherwise, need to search on the right side because we jumped over the inflexion point
+        elif value > minimum:
+            low = mid + 1
+
+    # Now normal binary search with fucked up index
+    low = 0
+    high = len(array) - 1
+    print(inflexion_point)
+    while low < high:
+        mid = (low + high) // 2
+        rotated_mid = (mid + inflexion_point) % len(array)
+        value = array[rotated_mid]
+        if value == element:
+            return rotated_mid
+        elif value < element:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+
 
 # 10.4 Sorted Search, No Size: You are given an array-like data structure Listy which lacks a size
 # method.  It does, however, have an elementAt(i) method that returns the element at index i in
