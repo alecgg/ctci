@@ -1,5 +1,10 @@
+
+
 # 10.1 Sorted Merge: You are given two sorted arrays, A and B, where A has a large enough buffer at the
 # end to hold B.  Write a method to merge B into A in sorted order
+from functools import cmp_to_key
+
+
 def sorted_merge(array, other_array):
     # can I reference the last element of B that is not a part of the buffer?
     # or do I get the buffer?
@@ -7,10 +12,42 @@ def sorted_merge(array, other_array):
     # compare fronts, and put smaller element into 0 position
     # element in 0 position is not the original element there, move the element to the back of
     # A in the buffer and continue with the buffer element as the next element of the other array
-    pass
+    array_i = array.index(None) - 1
+    other_array_i = len(other_array) - 1
+    for insertion in range(len(array) - 1, -1, -1):
+        value = array[array_i] if array_i >= 0 else None
+        other_value = other_array[other_array_i] if other_array_i >= 0 else None
+
+        if value is not None and other_value is not None:
+            if value > other_value:
+                array[insertion] = value
+                array_i -= 1
+            else:
+                array[insertion] = other_value
+                other_array_i -= 1
+        elif value is None:
+            array[insertion] = other_value
+            other_array_i -= 1
+        elif other_value is None:
+            array[insertion] = value
+            array_i -= 1
+    return array
+
 
 # 10.2 Group Anagrams: Write a method to sort an array of strings so that all the anagrams are next to
 # each other.
+def anagram_sort(string_array):
+    counts = [string_to_count(string) for string in string_array]
+    anagrams = []
+    for count in counts:
+        anagrams.extend([string for string in string_array if count == string_to_count(string)])
+        string_array = [string for string in string_array if count != string_to_count(string)]
+    return anagrams
+
+
+def string_to_count(string):
+    return {char: string.count(char) for char in string}
+
 
 # 10.3 Search in a Rotated Array: Given a sorted array of n integers that has been rotated an unknown
 # number of times, write code to find an element in the array.  You may assume that the array was
