@@ -1,10 +1,8 @@
+from bitarray import bitarray
 
 
 # 10.1 Sorted Merge: You are given two sorted arrays, A and B, where A has a large enough buffer at the
 # end to hold B.  Write a method to merge B into A in sorted order
-from functools import cmp_to_key
-
-
 def sorted_merge(array, other_array):
     # can I reference the last element of B that is not a part of the buffer?
     # or do I get the buffer?
@@ -185,13 +183,44 @@ def sparse_search(string_array, element):
 # FOLLOW UP
 # What if you only have 10 MB of memory.  Assume that all the values are distinct and we now have
 # no more than one billion non-negative integers.
+def missing_int(filename):
+    # lol, doesn't say it has to be a non-negative integer that you generate ;)
+    # in that case, just return -1
+    # otherwise, can just generate max(int in file) + 1
+    # only need to read file line by line and keep O(1) memory
+    maximum = None
+    with open(filename) as f:
+        for line in f:
+            maximum = max(m for m in (maximum, int(line.strip())) if m is not None)
+    return maximum + 1
+
 
 # 10.8 Find Duplicates: You have an array with all the numbers from 1 to N, where N is at most 32,000.  The
 # array may have duplicate entries and you do not know what N is.  With only 4 kilobytes of memory
 # available, how would you print all duplicate elements in the array?
+def find_dups(number_array):
+    # bit array -> O(n)
+    # or just for loop like normal -> O(n^2)
+    # sort and look for dups -> O(n*log n)
+    # 4 kilobytes = 32,000 bits
+    #
+    # make 32,000 bit array
+    # foreach number in number array ->
+    #   print i if ith bit in bit array is set
+    #   set ith bit in bit array
+    bits = bitarray(2**32)
+    bits.setall(False)
+    for number in number_array:
+        if bits[number]:
+            print(number)
+        bits[number] = True
+    return
+
 
 # 10.9 Sorted Matrix Search: Given an M x N matrix in which each row and each column is sorted in
 # ascending order, write a method to find an element.
+def sorted_matrix_search(matrix):
+    pass
 
 # 10.10 Rank from Stream: Imagine you are reading in a stream of integers.  Periodically you wish to be able
 # to look up the rank of a number x (the number of values less than or equal to x).  Implement the data
