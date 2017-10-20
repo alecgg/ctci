@@ -146,7 +146,29 @@ def sorted_search(listy, element):
 # output: 4
 def sparse_search(string_array, element):
     # binary search with linear scan for actual element instead of empty string
-    pass
+    low = 0
+    high = len(element) - 1
+    while low < high:
+        mid = (low + high) // 2
+        string = string_array[mid]
+
+        # scan to the right for an element if we hit empty string
+        if not string:
+            original_mid = mid
+            while not string and mid <= high:
+                mid += 1
+                string = string_array[mid]
+            if mid == high:
+                high = original_mid - 1
+                continue
+
+        if string == element:
+            return element
+        elif string < element:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
 
 
 # 10.6 Imagine you have a 20GB file with one string per line.  Explain how you would sort the file.
