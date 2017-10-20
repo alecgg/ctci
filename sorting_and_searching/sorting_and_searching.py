@@ -163,7 +163,7 @@ def sparse_search(string_array, element):
                 continue
 
         if string == element:
-            return element
+            return mid
         elif string < element:
             low = mid + 1
         else:
@@ -172,6 +172,12 @@ def sparse_search(string_array, element):
 
 
 # 10.6 Imagine you have a 20GB file with one string per line.  Explain how you would sort the file.
+
+# if I could fit all in memory, just load the file in memory, sort it, and print to file
+# if I couldn't fit all in memory, I would load as much of the file as I could into memory,
+# sort it, then dump to a temporary file.
+# After sorting the whole file into temporary sorted chunks, I would do an n-way merge of the sorted
+# chunks to get the original file but sorted out.
 
 # 10.7 Missing int: Given an input file with four billion non-negative integers, provide an algorithm to
 # generate an integer that is not contained in the file.  Assume you have 1 GB of memory available for
