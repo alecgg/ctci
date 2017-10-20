@@ -107,12 +107,47 @@ def rotated_search(element, array):
 # O(1) time.  If i is beyond the bounds of the data structure, it returns -1.  (For this reason, the data
 # structure supports only positive integers.)  Given a Listy which contains sorted, positive integers,
 # find the index at which an element x occurs.  If x occurs multiple times, you may return any index.
+def sorted_search(listy, element):
+    # could do a binary search for end of list then do normal binary search for element
+    low = 0
+    high = 5
+    while low < high:
+        mid = (low + high) // 2
+        # found end
+        if listy[mid] >= 0 and listy[mid + 1] == -1:
+            break
+
+        if listy[mid] != -1:
+            low = mid
+        else:
+            high = mid
+
+        if listy[high] != -1:
+            high *= 2
+
+    # now mid is end of list
+    low = 0
+    high = mid
+    while low < high:
+        mid = (low + high) // 2
+        if listy[mid] == element:
+            return mid
+        elif listy[mid] < element:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+
 
 # 10.5 Sparse Search: Given a sorted array of strings that is interspersed with empty strings, write a
 # method to find the location of a given string.
 # EXAMPLE
 # input: ball, {"at", "", "", "", "ball", "", "", "car", "", "", "dad", "", ""}}
 # output: 4
+def sparse_search(string_array, element):
+    # binary search with linear scan for actual element instead of empty string
+    pass
+
 
 # 10.6 Imagine you have a 20GB file with one string per line.  Explain how you would sort the file.
 
