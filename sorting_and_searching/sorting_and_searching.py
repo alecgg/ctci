@@ -219,16 +219,48 @@ def find_dups(number_array):
 
 # 10.9 Sorted Matrix Search: Given an M x N matrix in which each row and each column is sorted in
 # ascending order, write a method to find an element.
-def sorted_matrix_search(matrix):
-    pass
+def sorted_matrix_search(matrix, element):
+    low = 0
+    num_rows = len(matrix)
+    num_cols = len(matrix[0])
+    high = num_rows * num_cols - 1
+    while low <= high:
+        mid = (low + high) // 2
+        row_i = mid // num_cols
+        col_i = mid % num_cols
+        value = matrix[row_i][col_i]
+        if value == element:
+            return row_i, col_i
+        elif value <= element:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1, -1
+
 
 # 10.10 Rank from Stream: Imagine you are reading in a stream of integers.  Periodically you wish to be able
 # to look up the rank of a number x (the number of values less than or equal to x).  Implement the data
 # structures and algorithms to support the operations.  That is, implement the method track (int
 # x), which is called when each number is generated, and the method getRankOfNumber(int
-# x), which returns the number of values less than or equal to x(not including x itself).
+# x), which returns the number of values less than or equal to x (not including x itself).
+class IntegerStream:
+    def __init__(self):
+        self.counts = {}
+
+    def track(self, x):
+        self.counts[x] = self.counts.get(x, 0) + 1
+
+    def get_rank_of(self, x):
+        return sum(self.counts[v] for v in self.counts if v < x)
+
 
 # 10.11 Peaks and Valleys: In an array of integers, a "peak" is an element which is greater than or equal to
 # the adjacent integers and a "valley" is an element which is less than or equal to the adjacent integers.
 # For example, in the array {5, 8, 6, 2, 3, 4, 6}, {8, 6} are peaks and {5, 2} are valleys.  Given an array
 # of integers, sort the array into an alternating sequence of peaks and valleys.
+def peaks_and_valleys(array):
+    sorted_array = list(sorted(array))
+    for i in range(0, len(sorted_array) // 2, 2):
+        bigger_index = len(sorted_array) - 1 - i
+        sorted_array[i], sorted_array[bigger_index] = sorted_array[bigger_index], sorted_array[i]
+    return sorted_array
