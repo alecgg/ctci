@@ -1,14 +1,32 @@
 # 16.1 Number Swapper: Write a function to swap a number in place (that is, without temporary variables).
+def swap(a, b):
+    a ^= b
+    b ^= a
+    a ^= b
+    return a, b
+
 
 # 16.2 Word Frequencies: Design a method to find the frequency of a occurrences of any given word in a
 # book.  What if we were running this algorithm multiple times?
+def word_frequency(book, word, frequencies=None):
+    # if calling multiple times, cache book -> word -> frequencies or pre-compute
+    return book.count(word)
+
 
 # 16.3 Intersection: Given two straight line segments (represented as a start point and an end point),
 # compute the point of intersection, if any.
+def intersection(line, other_line):
+    pass
+
 
 # 16.4 Tic Tac Win: Design algorithm to figure out if someone has one a game of tic-tac-toe.
+def tic_tac_toe(board):
+    pass
+
 
 # 16.5 Factorial Zeros: Write an algorithm which computes the number of trailing zeros in n factorial.
+def factorial_zeros():
+    pass
 
 # 16.6 Smallest Difference: Given two arrays of integers, compute the pair of values (one value in each
 # array with the smallest (non-negative) difference.  Return the difference
